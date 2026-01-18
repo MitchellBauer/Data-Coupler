@@ -1,0 +1,21 @@
+{
+  "id": "dev-test-01",
+  "name": "Developer Test Profile",
+  "description": "Maps ID and Name, ignores Email.",
+  "settings": {
+    "skipHeader": true,
+    "delimiter": ","
+  },
+  "mappings": [
+    {
+      "inputCol": "SourceID",
+      "outputCol": "User_ID",
+      "transform": "none"
+    },
+    {
+      "inputCol": "FullName",
+      "outputCol": "Display_Name",
+      "transform": "none"
+    }
+  ]
+}
