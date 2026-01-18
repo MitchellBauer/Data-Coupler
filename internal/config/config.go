@@ -1,7 +1,7 @@
 package config
 
 import (
-	"data-coupler/internal/types"
+	"github.com/mitchellbauer/data-coupler/internal/types"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -24,3 +24,5 @@ func LoadProfile(path string) (types.Profile, error) {
 
 	return p, nil
 }
+
+

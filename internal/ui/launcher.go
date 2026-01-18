@@ -59,3 +59,5 @@ func LaunchApp() {
 	myWindow.SetContent(content)
 	myWindow.ShowAndRun()
 }
+
+

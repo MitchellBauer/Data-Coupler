@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"data-coupler/internal/types"
+	"github.com/mitchellbauer/data-coupler/internal/types"
 	"reflect"
 	"testing"
 )
@@ -73,3 +73,5 @@ func TestValidateHeaders_Success(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 }
+
+

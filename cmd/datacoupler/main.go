@@ -1,9 +1,9 @@
 package main
 
 import (
-	"data-coupler/internal/config"
-	"data-coupler/internal/engine"
-	"data-coupler/internal/ui"
+	"github.com/mitchellbauer/data-coupler/internal/config"
+	"github.com/mitchellbauer/data-coupler/internal/engine"
+	"github.com/mitchellbauer/data-coupler/internal/ui"
 	"flag"
 	"fmt"
 	"os"
@@ -64,3 +64,5 @@ func runCLI(in, out, prof string, dry bool) error {
 func runGUI() {
 	ui.LaunchApp()
 }
+
+

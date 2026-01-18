@@ -21,3 +21,5 @@ type Profile struct {
 	Settings    IOConfig  `json:"settings"`    // Global file settings
 	Mappings    []Mapping `json:"mappings"`    // List of column pairs
 }
+
+

@@ -3,7 +3,7 @@ package engine
 import (
 	"bufio"
 	"bytes"
-	"data-coupler/internal/types" // <--- Import your types package
+	"github.com/mitchellbauer/data-coupler/internal/types" // <--- Import your types package
 	"encoding/csv"
 	"fmt"
 	"os"
@@ -138,3 +138,5 @@ func Run(inputPath string, outputPath string, p types.Profile) error {
 
 	return nil
 }
+
+
