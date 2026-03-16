@@ -1,21 +1,12 @@
 {
   "id": "dev-test-01",
+  "version": 1,
   "name": "Developer Test Profile",
   "description": "Maps ID and Name, ignores Email.",
-  "settings": {
-    "skipHeader": true,
-    "delimiter": ","
-  },
+  "input":  { "connector": "csv", "path": "" },
+  "output": { "connector": "csv", "path": "" },
   "mappings": [
-    {
-      "inputCol": "SourceID",
-      "outputCol": "User_ID",
-      "transform": "none"
-    },
-    {
-      "inputCol": "FullName",
-      "outputCol": "Display_Name",
-      "transform": "none"
-    }
+    { "inputCol": "SourceID",  "outputCol": "User_ID",      "transforms": [] },
+    { "inputCol": "FullName",  "outputCol": "Display_Name", "transforms": [] }
   ]
 }

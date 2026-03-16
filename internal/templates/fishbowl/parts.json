@@ -1,0 +1,17 @@
+{
+  "id": "fishbowl/parts",
+  "name": "Fishbowl Parts Import",
+  "description": "Import or update Part records in Fishbowl.",
+  "columns": [
+    { "name": "Part Number",       "required": true,  "description": "Unique part identifier." },
+    { "name": "Description",       "required": true,  "description": "Part description." },
+    { "name": "Part Type",         "required": true,  "description": "Type of part (e.g. Inventory, Service)." },
+    { "name": "UOM",               "required": true,  "description": "Unit of measure (e.g. ea, lb)." },
+    { "name": "Price",             "required": false, "description": "Default sell price." },
+    { "name": "Cost",              "required": false, "description": "Standard cost." },
+    { "name": "Active",            "required": false, "description": "Whether the part is active (true/false)." },
+    { "name": "Weight",            "required": false, "description": "Part weight." },
+    { "name": "Weight UOM",        "required": false, "description": "Unit of measure for weight (e.g. lb, kg)." },
+    { "name": "Default Location",  "required": false, "description": "Default inventory location." }
+  ]
+}

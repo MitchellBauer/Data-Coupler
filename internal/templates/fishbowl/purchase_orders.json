@@ -1,0 +1,16 @@
+{
+  "id": "fishbowl/purchase_orders",
+  "name": "Fishbowl Purchase Orders Import",
+  "description": "Import Purchase Order records into Fishbowl.",
+  "columns": [
+    { "name": "PO Number",     "required": true,  "description": "Unique purchase order number." },
+    { "name": "Vendor Name",   "required": true,  "description": "Name of the vendor." },
+    { "name": "Part Number",   "required": true,  "description": "Part number being ordered." },
+    { "name": "Quantity",      "required": true,  "description": "Quantity ordered." },
+    { "name": "Date",          "required": false, "description": "PO issue date (YYYY-MM-DD)." },
+    { "name": "Description",   "required": false, "description": "Line item description." },
+    { "name": "Unit Cost",     "required": false, "description": "Cost per unit." },
+    { "name": "Location",      "required": false, "description": "Destination inventory location." },
+    { "name": "Note",          "required": false, "description": "Additional notes." }
+  ]
+}

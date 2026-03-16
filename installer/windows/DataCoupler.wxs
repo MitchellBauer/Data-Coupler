@@ -1,0 +1,58 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Name="Data Coupler"
+    Manufacturer="Mitchell Bauer"
+    Version="$(var.Version)"
+    UpgradeCode="A3F2B1C4-7D8E-4F9A-B0C1-2D3E4F5A6B7C"
+    Scope="perMachine">
+
+    <!-- Allow in-place upgrades: remove the old version before installing the new one -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Data Coupler is already installed." />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="Data Coupler" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="ApplicationShortcut" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="DataCoupler" />
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="Data Coupler" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="ProductComponent">
+        <File Id="DataCouplerExe"
+              Source="..\..\Data Coupler.exe"
+              Name="Data Coupler.exe"
+              KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="B4C3D2E1-8F9A-4B0C-A1D2-3E4F5A6B7C8D">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="Data Coupler"
+                  Description="The modular data conversion tool"
+                  Target="[INSTALLFOLDER]Data Coupler.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU"
+                       Key="Software\DataCoupler"
+                       Name="installed"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+</Wix>

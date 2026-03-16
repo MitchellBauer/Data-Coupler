@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go build:*)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(go test:*)",
+      "Bash(go run:*)",
+      "Bash(chub search:*)",
+      "Bash(go get:*)"
+    ]
+  }
+}

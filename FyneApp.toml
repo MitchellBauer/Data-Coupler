@@ -1,0 +1,11 @@
+Website = "https://github.com/mitchellbauer/data-coupler"
+Name = "Data Coupler"
+ID = "com.mitchellbauer.datacoupler"
+
+[Details]
+  Icon = "Icon.png"
+  Build = 1
+  Version = "0.1.0"
+
+  [Details.Keywords]
+    Keywords = ["data", "csv", "conversion"]

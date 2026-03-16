@@ -1,0 +1,15 @@
+{
+  "id": "fishbowl/bom",
+  "name": "Fishbowl Bill of Materials Import",
+  "description": "Import or update Bill of Materials records in Fishbowl.",
+  "columns": [
+    { "name": "BOM Number",    "required": true,  "description": "Unique BOM identifier." },
+    { "name": "BOM Type",      "required": true,  "description": "Type of BOM (e.g. Finished Good, Raw Good)." },
+    { "name": "Quantity",      "required": true,  "description": "Quantity produced by this BOM." },
+    { "name": "Part Number",   "required": false, "description": "Part number of the finished good." },
+    { "name": "Description",   "required": false, "description": "BOM description." },
+    { "name": "Instructions",  "required": false, "description": "Assembly instructions." },
+    { "name": "Stage",         "required": false, "description": "Production stage name." },
+    { "name": "Note",          "required": false, "description": "Additional notes." }
+  ]
+}

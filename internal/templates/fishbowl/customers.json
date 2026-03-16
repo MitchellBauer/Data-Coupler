@@ -1,0 +1,22 @@
+{
+  "id": "fishbowl/customers",
+  "name": "Fishbowl Customers Import",
+  "description": "Import or update Customer records in Fishbowl.",
+  "columns": [
+    { "name": "Customer Name",    "required": true,  "description": "Full customer name." },
+    { "name": "Customer Number",  "required": false, "description": "Unique customer identifier." },
+    { "name": "Account Number",   "required": false, "description": "External account number." },
+    { "name": "Default Terms",    "required": false, "description": "Payment terms (e.g. Net 30)." },
+    { "name": "Tax Rate",         "required": false, "description": "Tax rate name applied to this customer." },
+    { "name": "Active",           "required": false, "description": "Whether the customer is active (true/false)." },
+    { "name": "Address Name",     "required": false, "description": "Name for the default address." },
+    { "name": "Address",          "required": false, "description": "Street address." },
+    { "name": "City",             "required": false, "description": "City." },
+    { "name": "State",            "required": false, "description": "State or province." },
+    { "name": "Zip",              "required": false, "description": "ZIP or postal code." },
+    { "name": "Country",          "required": false, "description": "Country." },
+    { "name": "Main Phone",       "required": false, "description": "Primary phone number." },
+    { "name": "Email",            "required": false, "description": "Email address." },
+    { "name": "Sales Rep",        "required": false, "description": "Assigned sales representative." }
+  ]
+}

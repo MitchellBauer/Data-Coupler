@@ -28,7 +28,10 @@ func TestMapRow(t *testing.T) {
 	inputRow := []string{"Alice", "X", "101"}
 
 	// Execution
-	result := MapRow(inputRow, headerMap, profile)
+	result, err := MapRow(inputRow, headerMap, profile)
+	if err != nil {
+		t.Fatalf("MapRow() unexpected error: %v", err)
+	}
 
 	// Expectation: [ "101", "Alice" ] (Order based on Mappings list)
 	expected := []string{"101", "Alice"}
@@ -73,5 +76,3 @@ func TestValidateHeaders_Success(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 }
-
-

@@ -1,0 +1,21 @@
+{
+  "id": "fishbowl/vendors",
+  "name": "Fishbowl Vendors Import",
+  "description": "Import or update Vendor records in Fishbowl.",
+  "columns": [
+    { "name": "Vendor Name",      "required": true,  "description": "Full vendor name." },
+    { "name": "Vendor Number",    "required": false, "description": "Unique vendor identifier." },
+    { "name": "Account Number",   "required": false, "description": "External account number." },
+    { "name": "Default Terms",    "required": false, "description": "Payment terms (e.g. Net 30)." },
+    { "name": "Active",           "required": false, "description": "Whether the vendor is active (true/false)." },
+    { "name": "Address Name",     "required": false, "description": "Name for the default address." },
+    { "name": "Address",          "required": false, "description": "Street address." },
+    { "name": "City",             "required": false, "description": "City." },
+    { "name": "State",            "required": false, "description": "State or province." },
+    { "name": "Zip",              "required": false, "description": "ZIP or postal code." },
+    { "name": "Country",          "required": false, "description": "Country." },
+    { "name": "Main Phone",       "required": false, "description": "Primary phone number." },
+    { "name": "Email",            "required": false, "description": "Email address." },
+    { "name": "Currency",         "required": false, "description": "Currency code (e.g. USD)." }
+  ]
+}

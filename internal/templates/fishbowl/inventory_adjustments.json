@@ -1,0 +1,14 @@
+{
+  "id": "fishbowl/inventory_adjustments",
+  "name": "Fishbowl Inventory Adjustments Import",
+  "description": "Import inventory adjustment records into Fishbowl.",
+  "columns": [
+    { "name": "Part Number",       "required": true,  "description": "Part number to adjust." },
+    { "name": "Quantity",          "required": true,  "description": "Adjustment quantity (positive or negative)." },
+    { "name": "Location",          "required": false, "description": "Inventory location." },
+    { "name": "Lot Number",        "required": false, "description": "Lot or batch number." },
+    { "name": "Expiration Date",   "required": false, "description": "Lot expiration date (YYYY-MM-DD)." },
+    { "name": "Note",              "required": false, "description": "Reason for adjustment." },
+    { "name": "Unit Cost",         "required": false, "description": "Cost per unit for this adjustment." }
+  ]
+}

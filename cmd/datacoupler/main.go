@@ -1,16 +1,47 @@
 package main
 
 import (
-	"github.com/mitchellbauer/data-coupler/internal/config"
-	"github.com/mitchellbauer/data-coupler/internal/engine"
-	"github.com/mitchellbauer/data-coupler/internal/ui"
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
+	"time"
+
+	"github.com/mitchellbauer/data-coupler/internal/audit"
+	"github.com/mitchellbauer/data-coupler/internal/config"
+	"github.com/mitchellbauer/data-coupler/internal/connector"
+	csvconn    "github.com/mitchellbauer/data-coupler/internal/connector/csv"
+	mssqlconn  "github.com/mitchellbauer/data-coupler/internal/connector/mssql"
+	sqliteconn "github.com/mitchellbauer/data-coupler/internal/connector/sqlite"
+	mysqlconn  "github.com/mitchellbauer/data-coupler/internal/connector/mysql"
+	pgconn     "github.com/mitchellbauer/data-coupler/internal/connector/postgres"
+	"github.com/mitchellbauer/data-coupler/internal/credentials"
+	"github.com/mitchellbauer/data-coupler/internal/engine"
+	"github.com/mitchellbauer/data-coupler/internal/transform"
+	"github.com/mitchellbauer/data-coupler/internal/ui"
 )
 
 func main() {
-	// 1. Define Flags
+	// Register all connectors at startup.
+	connector.Register(&csvconn.CSVConnector{})
+	connector.Register(&mssqlconn.MSSQLConnector{})
+	connector.Register(&sqliteconn.SQLiteConnector{})
+	connector.Register(&mysqlconn.MySQLConnector{})
+	connector.Register(&pgconn.PostgreSQLConnector{})
+
+	// Register transforms at startup.
+	transform.Register(&transform.TrimSpace{})
+	transform.Register(&transform.Default{})
+	transform.Register(&transform.ToUpper{})
+	transform.Register(&transform.ToLower{})
+	transform.Register(&transform.DateFormat{})
+	transform.Register(&transform.Split{})
+	transform.Register(&transform.Prefix{})
+	transform.Register(&transform.Suffix{})
+	transform.Register(&transform.LookupReplace{})
+	transform.Register(&transform.Concatenate{})
+
+	// Define flags.
 	inPath := flag.String("in", "", "Path to source CSV file")
 	outPath := flag.String("out", "", "Path to destination CSV file")
 	profilePath := flag.String("profile", "", "Path to JSON profile")
@@ -18,51 +49,84 @@ func main() {
 
 	flag.Parse()
 
-	// 2. Mode Selection
-	// If no inputs are provided, assume the user wants the GUI.
+	// Mode selection: no flags → GUI (LaunchApp handles its own initialization).
 	if *inPath == "" && *profilePath == "" {
-		runGUI()
+		ui.LaunchApp()
 		return
 	}
 
-	// 3. CLI Mode Validation
+	// CLI mode validation.
 	if *inPath == "" || *outPath == "" || *profilePath == "" {
 		fmt.Println("❌ Error: CLI mode requires -in, -out, and -profile flags.")
 		fmt.Println("Usage: data-coupler -in <file> -out <file> -profile <json>")
 		os.Exit(1)
 	}
 
-	// 4. Run Conversion
-	if err := runCLI(*inPath, *outPath, *profilePath, *dryRun); err != nil {
+	// CLI-only initialization (GUI path handles its own setup in LaunchApp).
+	appDir := filepath.Dir(os.Args[0])
+	credStore := credentials.NewFileStore(appDir)
+	audit.SetLogPath(appDir)
+	_ = audit.TrimLog(1000)
+	settingsPath := filepath.Join(appDir, "settings.json")
+	settings, _ := config.LoadSettings(settingsPath)
+
+	// Run conversion.
+	if err := runCLI(*inPath, *outPath, *profilePath, *dryRun, credStore); err != nil {
 		fmt.Printf("❌ Failed: %v\n", err)
 		os.Exit(1)
 	}
 
 	fmt.Println("✅ Conversion Complete!")
+
+	// Persist last-used profile path.
+	settings.LastConnector = "csv"
+	settings.LastProfilePath = *profilePath
+	_ = config.SaveSettings(settingsPath, settings)
 }
 
-func runCLI(in, out, prof string, dry bool) error {
-	// A. Load Profile
+func runCLI(in, out, prof string, dry bool, creds credentials.Store) error {
 	fmt.Printf("📂 Loading Profile: %s...\n", prof)
 	profile, err := config.LoadProfile(prof)
 	if err != nil {
 		return err
 	}
 
-	// B. Dry Run Check
+	// Override file paths from CLI flags (CSV profiles only).
+	if in != "" {
+		profile.Input.Path = in
+	}
+	if out != "" {
+		profile.Output.Path = out
+	}
+
 	if dry {
 		fmt.Println("running in dry-run mode... (Validation passed)")
 		fmt.Printf("Would map %s -> %s using profile '%s'\n", in, out, profile.Name)
 		return nil
 	}
 
-	// C. Execute Engine
-	fmt.Printf("⚙️  Mapping %s -> %s...\n", in, out)
-	return engine.Run(in, out, profile)
+	fmt.Printf("⚙️  Running conversion using profile '%s'...\n", profile.Name)
+	startTime := time.Now()
+	count, runErr := engine.Run(profile, creds)
+
+	errStr := ""
+	if runErr != nil {
+		errStr = runErr.Error()
+	}
+	_ = audit.AppendEntry(audit.AuditEntry{
+		Timestamp:   startTime,
+		ProfileName: profile.Name,
+		ProfileID:   profile.ID,
+		InputSource: "csv: " + filepath.Base(in),
+		OutputPath:  out,
+		RowsOut:     count,
+		DurationMs:  time.Since(startTime).Milliseconds(),
+		Error:       errStr,
+	})
+
+	if runErr != nil {
+		return runErr
+	}
+	fmt.Printf("✅  %d rows processed.\n", count)
+	return nil
 }
-
-func runGUI() {
-	ui.LaunchApp()
-}
-
-

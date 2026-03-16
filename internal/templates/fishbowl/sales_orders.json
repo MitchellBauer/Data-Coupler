@@ -1,0 +1,20 @@
+{
+  "id": "fishbowl/sales_orders",
+  "name": "Fishbowl Sales Orders Import",
+  "description": "Import Sales Order records into Fishbowl.",
+  "columns": [
+    { "name": "SO Number",         "required": true,  "description": "Unique sales order number." },
+    { "name": "Customer Name",     "required": true,  "description": "Name of the customer." },
+    { "name": "Part Number",       "required": true,  "description": "Part number being sold." },
+    { "name": "Quantity",          "required": true,  "description": "Quantity ordered." },
+    { "name": "Date",              "required": false, "description": "SO issue date (YYYY-MM-DD)." },
+    { "name": "Description",       "required": false, "description": "Line item description." },
+    { "name": "Unit Price",        "required": false, "description": "Sell price per unit." },
+    { "name": "Ship To Name",      "required": false, "description": "Ship-to contact name." },
+    { "name": "Ship To Address",   "required": false, "description": "Ship-to street address." },
+    { "name": "Ship To City",      "required": false, "description": "Ship-to city." },
+    { "name": "Ship To State",     "required": false, "description": "Ship-to state or province." },
+    { "name": "Ship To Zip",       "required": false, "description": "Ship-to ZIP or postal code." },
+    { "name": "Note",              "required": false, "description": "Additional notes." }
+  ]
+}
