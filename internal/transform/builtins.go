@@ -124,6 +124,19 @@ func (t *LookupReplace) Apply(value string, params map[string]string) (string, e
 	return value, nil
 }
 
+func init() {
+	Register(&TrimSpace{})
+	Register(&Default{})
+	Register(&ToUpper{})
+	Register(&ToLower{})
+	Register(&DateFormat{})
+	Register(&Split{})
+	Register(&Prefix{})
+	Register(&Suffix{})
+	Register(&LookupReplace{})
+	Register(&Concatenate{})
+}
+
 // ── Multi-column transform ────────────────────────────────────────────────────
 
 // Concatenate merges values from multiple input columns into one output value.

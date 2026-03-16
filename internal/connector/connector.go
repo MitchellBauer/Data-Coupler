@@ -20,3 +20,10 @@ type Connector interface {
 	Columns(query string) ([]string, error)
 	Rows(query string) (<-chan []string, error)
 }
+
+// Writer is an optional interface for connectors that support output.
+// WriteAll writes headers and all rows from the channel to the destination
+// identified by path, returning the number of data rows written.
+type Writer interface {
+	WriteAll(path string, headers []string, rows <-chan []string) (int, error)
+}

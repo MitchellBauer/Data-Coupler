@@ -14,7 +14,11 @@ import (
 // treat errors as "no update available" and not surface them to the user.
 func CheckLatestRelease(owner, repo string) (string, error) {
 	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/latest", owner, repo)
+	return checkRelease(url)
+}
 
+// checkRelease performs the HTTP fetch and parses the tag_name field.
+func checkRelease(url string) (string, error) {
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Get(url)
 	if err != nil {

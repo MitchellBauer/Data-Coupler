@@ -18,6 +18,7 @@ import (
 // StepInputSQL is the SQL input configuration step. It renders differently
 // depending on wiz.State.InputConnectorName:
 //   - "sqlite": shows a file picker only
+//   - "odbc": shows a DSN name + credentials form + SQL query area
 //   - "mssql" / "mysql" / "postgres": shows a server connection form + SQL query area
 type StepInputSQL struct {
 	wiz        *Wizard
@@ -52,7 +53,12 @@ type StepInputSQL struct {
 	errorLbl         *widget.Label
 }
 
-func (s *StepInputSQL) Title() string { return "Configure SQL Input" }
+func (s *StepInputSQL) Title() string {
+	if s.wiz.State.InputConnectorName == "odbc" {
+		return "Configure ODBC Input"
+	}
+	return "Configure SQL Input"
+}
 
 func (s *StepInputSQL) Content() fyne.CanvasObject {
 	// Rebuild if the connector type changed since last render.
@@ -69,6 +75,8 @@ func (s *StepInputSQL) Content() fyne.CanvasObject {
 
 	if s.wiz.State.InputConnectorName == "sqlite" {
 		s.content = s.buildSQLiteContent()
+	} else if s.wiz.State.InputConnectorName == "odbc" {
+		s.content = s.buildODBCContent()
 	} else {
 		s.content = s.buildServerContent()
 	}
@@ -132,6 +140,93 @@ func (s *StepInputSQL) testSQLiteFile(path string) {
 		s.fileEntry.Disable()
 		s.errorLbl.Hide()
 	})
+}
+
+// ── ODBC layout ───────────────────────────────────────────────────────────────
+
+func (s *StepInputSQL) buildODBCContent() fyne.CanvasObject {
+	s.dbEntry = widget.NewEntry()
+	s.dbEntry.SetPlaceHolder("e.g. MyDataSource")
+
+	s.userEntry = widget.NewEntry()
+	s.userEntry.SetPlaceHolder("username (optional)")
+
+	s.passEntry = widget.NewPasswordEntry()
+	s.passEntry.SetPlaceHolder("password (optional)")
+
+	s.credRefEntry = widget.NewEntry()
+	s.credRefEntry.SetPlaceHolder("e.g. odbc-prod")
+
+	s.saveCredsCheck = widget.NewCheck("Save credentials", nil)
+
+	s.testStatusLbl = widget.NewLabel("")
+	s.testStatusLbl.Hide()
+
+	s.testBtn = widget.NewButton("Test Connection", s.onTestConnection)
+	s.testBtn.Importance = widget.MediumImportance
+
+	formGrid := container.New(newTwoColFormLayout(),
+		widget.NewLabel("DSN Name"), s.dbEntry,
+		widget.NewLabel("Username"), s.userEntry,
+		widget.NewLabel("Password"), s.passEntry,
+		widget.NewLabel("Credential name"), s.credRefEntry,
+		widget.NewLabel(""), s.saveCredsCheck,
+	)
+
+	testRow := container.NewVBox(
+		container.NewBorder(nil, nil, nil, s.testBtn, s.testStatusLbl),
+		widget.NewSeparator(),
+	)
+
+	s.queryEntry = widget.NewMultiLineEntry()
+	s.queryEntry.SetPlaceHolder("SELECT column1, column2 FROM table WHERE ...")
+	s.queryEntry.SetMinRowsVisible(4)
+	s.queryEntry.OnChanged = func(q string) {
+		s.wiz.State.InputQuery = q
+	}
+
+	s.table = widget.NewTable(
+		func() (int, int) {
+			if len(s.headers) == 0 {
+				return 0, 0
+			}
+			return 1 + len(s.rows), len(s.headers)
+		},
+		func() fyne.CanvasObject { return widget.NewLabel("") },
+		func(id widget.TableCellID, obj fyne.CanvasObject) {
+			lbl := obj.(*widget.Label)
+			if id.Row == 0 {
+				lbl.TextStyle = fyne.TextStyle{Bold: true}
+				if id.Col < len(s.headers) {
+					lbl.SetText(s.headers[id.Col])
+				}
+			} else {
+				lbl.TextStyle = fyne.TextStyle{}
+				dataRow := id.Row - 1
+				if dataRow < len(s.rows) && id.Col < len(s.rows[dataRow]) {
+					lbl.SetText(s.rows[dataRow][id.Col])
+				} else {
+					lbl.SetText("")
+				}
+			}
+		},
+	)
+
+	noPreviewLbl := widget.NewLabel("Enter a query above and click Preview.")
+	noPreviewLbl.Alignment = fyne.TextAlignCenter
+	s.previewStack = container.NewStack(container.NewCenter(noPreviewLbl))
+
+	s.previewBtn = widget.NewButton("Preview Query", s.onPreview)
+
+	querySection := container.NewVBox(
+		widget.NewLabel("SQL Query"),
+		s.queryEntry,
+		container.NewBorder(nil, nil, nil, s.previewBtn, widget.NewLabel("")),
+		widget.NewLabel("Preview (first 10 rows):"),
+	)
+
+	top := container.NewPadded(container.NewVBox(formGrid, testRow, s.errorLbl, querySection))
+	return container.NewBorder(top, nil, nil, nil, container.NewPadded(s.previewStack))
 }
 
 // ── Server connector layout (MSSQL / MySQL / PostgreSQL) ──────────────────────
@@ -353,6 +448,13 @@ func (s *StepInputSQL) onPreview() {
 }
 
 func (s *StepInputSQL) buildConnectionConfig() connector.ConnectionConfig {
+	if s.wiz.State.InputConnectorName == "odbc" {
+		return connector.ConnectionConfig{
+			Database: s.dbEntry.Text,
+			Username: s.userEntry.Text,
+			Password: s.passEntry.Text,
+		}
+	}
 	port, _ := strconv.Atoi(s.portEntry.Text)
 	return connector.ConnectionConfig{
 		Host:     s.hostEntry.Text,

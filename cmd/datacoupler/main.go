@@ -9,38 +9,21 @@ import (
 
 	"github.com/mitchellbauer/data-coupler/internal/audit"
 	"github.com/mitchellbauer/data-coupler/internal/config"
-	"github.com/mitchellbauer/data-coupler/internal/connector"
-	csvconn    "github.com/mitchellbauer/data-coupler/internal/connector/csv"
-	mssqlconn  "github.com/mitchellbauer/data-coupler/internal/connector/mssql"
-	sqliteconn "github.com/mitchellbauer/data-coupler/internal/connector/sqlite"
-	mysqlconn  "github.com/mitchellbauer/data-coupler/internal/connector/mysql"
-	pgconn     "github.com/mitchellbauer/data-coupler/internal/connector/postgres"
 	"github.com/mitchellbauer/data-coupler/internal/credentials"
 	"github.com/mitchellbauer/data-coupler/internal/engine"
-	"github.com/mitchellbauer/data-coupler/internal/transform"
 	"github.com/mitchellbauer/data-coupler/internal/ui"
+
+	// Self-registering packages — imported for side effects only.
+	_ "github.com/mitchellbauer/data-coupler/internal/connector/csv"
+	_ "github.com/mitchellbauer/data-coupler/internal/connector/mssql"
+	_ "github.com/mitchellbauer/data-coupler/internal/connector/mysql"
+	_ "github.com/mitchellbauer/data-coupler/internal/connector/odbc"
+	_ "github.com/mitchellbauer/data-coupler/internal/connector/postgres"
+	_ "github.com/mitchellbauer/data-coupler/internal/connector/sqlite"
+	_ "github.com/mitchellbauer/data-coupler/internal/transform"
 )
 
 func main() {
-	// Register all connectors at startup.
-	connector.Register(&csvconn.CSVConnector{})
-	connector.Register(&mssqlconn.MSSQLConnector{})
-	connector.Register(&sqliteconn.SQLiteConnector{})
-	connector.Register(&mysqlconn.MySQLConnector{})
-	connector.Register(&pgconn.PostgreSQLConnector{})
-
-	// Register transforms at startup.
-	transform.Register(&transform.TrimSpace{})
-	transform.Register(&transform.Default{})
-	transform.Register(&transform.ToUpper{})
-	transform.Register(&transform.ToLower{})
-	transform.Register(&transform.DateFormat{})
-	transform.Register(&transform.Split{})
-	transform.Register(&transform.Prefix{})
-	transform.Register(&transform.Suffix{})
-	transform.Register(&transform.LookupReplace{})
-	transform.Register(&transform.Concatenate{})
-
 	// Define flags.
 	inPath := flag.String("in", "", "Path to source CSV file")
 	outPath := flag.String("out", "", "Path to destination CSV file")

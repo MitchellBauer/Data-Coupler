@@ -1,9 +1,7 @@
 package engine
 
 import (
-	"encoding/csv"
 	"fmt"
-	"os"
 
 	"github.com/mitchellbauer/data-coupler/internal/connector"
 	"github.com/mitchellbauer/data-coupler/internal/credentials"
@@ -120,37 +118,44 @@ func Run(p types.Profile, creds credentials.Store) (int, error) {
 		return 0, err
 	}
 
-	// 6. Create output file and writer.
-	outFile, err := os.Create(p.Output.Path)
-	if err != nil {
-		return 0, fmt.Errorf("failed to create output file: %w", err)
+	// 6. Resolve output connector.
+	outputConn, ok := connector.Get(p.Output.Connector)
+	if !ok {
+		return 0, fmt.Errorf("unknown output connector: %q", p.Output.Connector)
 	}
-	defer outFile.Close()
+	writer, ok := outputConn.(connector.Writer)
+	if !ok {
+		return 0, fmt.Errorf("connector %q does not support writing", p.Output.Connector)
+	}
 
-	writer := csv.NewWriter(outFile)
-	defer writer.Flush()
-
-	// 7. Write output headers.
+	// 7. Build output headers.
 	outputHeaders := make([]string, len(p.Mappings))
 	for i, m := range p.Mappings {
 		outputHeaders[i] = m.OutputCol
 	}
-	if err := writer.Write(outputHeaders); err != nil {
-		return 0, fmt.Errorf("failed to write output headers: %w", err)
-	}
 
-	// 8. Process and write data rows.
-	rowsWritten := 0
-	for row := range rowCh {
-		newRow, err := MapRow(row, headerMap, p)
-		if err != nil {
-			return rowsWritten, fmt.Errorf("row %d: %w", rowsWritten+1, err)
+	// 8. Transform input rows into output channel.
+	outCh := make(chan []string)
+	var transformErr error
+	go func() {
+		defer close(outCh)
+		rowNum := 0
+		for row := range rowCh {
+			rowNum++
+			newRow, err := MapRow(row, headerMap, p)
+			if err != nil {
+				transformErr = fmt.Errorf("row %d: %w", rowNum, err)
+				return
+			}
+			outCh <- newRow
 		}
-		if err := writer.Write(newRow); err != nil {
-			return rowsWritten, fmt.Errorf("error writing row %d: %w", rowsWritten+1, err)
-		}
-		rowsWritten++
-	}
+	}()
 
-	return rowsWritten, nil
+	// 9. Write output; drain rowCh to prevent goroutine leak on early transform error.
+	count, err := writer.WriteAll(p.Output.Path, outputHeaders, outCh)
+	for range rowCh {}
+	if transformErr != nil {
+		return count, transformErr
+	}
+	return count, err
 }

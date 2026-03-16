@@ -8,6 +8,7 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	fyne.io/systray v1.12.0 // indirect
 	github.com/BurntSushi/toml v1.5.0 // indirect
+	github.com/alexbrainman/odbc v0.0.0-20250601004241-49e6b2bc0cf0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fredbi/uri v1.1.1 // indirect

@@ -83,3 +83,31 @@ func (c *CSVConnector) Rows(_ string) (<-chan []string, error) {
 	}()
 	return ch, nil
 }
+
+func init() { connector.Register(&CSVConnector{}) }
+
+// WriteAll implements connector.Writer. It creates the file at path, writes
+// headers as the first row, then writes all rows received from the channel.
+func (c *CSVConnector) WriteAll(path string, headers []string, rows <-chan []string) (int, error) {
+	f, err := os.Create(path)
+	if err != nil {
+		return 0, fmt.Errorf("csv: create %s: %w", path, err)
+	}
+	defer f.Close()
+
+	w := csv.NewWriter(f)
+	defer w.Flush()
+
+	if err := w.Write(headers); err != nil {
+		return 0, fmt.Errorf("csv: write headers: %w", err)
+	}
+
+	count := 0
+	for row := range rows {
+		if err := w.Write(row); err != nil {
+			return count, fmt.Errorf("csv: write row %d: %w", count+1, err)
+		}
+		count++
+	}
+	return count, nil
+}
